@@ -428,9 +428,13 @@ func (h *dockerContainerHandler) GetStats() (*info.ContainerStats, error) {
 	// includes containers running in Kubernetes pods that use the network of the
 	// infrastructure container. This stops metrics being reported multiple times
 	// for each container in a pod.
-	if !h.needNet() {
-		stats.Network = info.NetworkStats{}
-	}
+
+	// THIS IS COMMENTED OUT TO MAKE NETWORK STATS WORK WITH NODMAD
+	// IF THIS IS ENABLED NETWORK METRICS WILL BE DROPPED
+
+	// if !h.needNet() {
+	// 	stats.Network = info.NetworkStats{}
+	// }
 
 	// Get filesystem stats.
 	err = h.getFsStats(stats)
