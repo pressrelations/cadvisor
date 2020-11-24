@@ -345,7 +345,9 @@ func (h *dockerContainerHandler) ContainerReference() (info.ContainerReference, 
 
 func (h *dockerContainerHandler) needNet() bool {
 	if h.includedMetrics.Has(container.NetworkUsageMetrics) {
-		return !h.networkMode.IsContainer()
+		// forcing needNet to true if it has networkUsageMetrics
+		// otherwise it'll drop all network stats
+		return true
 	}
 	return false
 }
@@ -429,12 +431,9 @@ func (h *dockerContainerHandler) GetStats() (*info.ContainerStats, error) {
 	// infrastructure container. This stops metrics being reported multiple times
 	// for each container in a pod.
 
-	// THIS IS COMMENTED OUT TO MAKE NETWORK STATS WORK WITH NODMAD
-	// IF THIS IS ENABLED NETWORK METRICS WILL BE DROPPED
-
-	// if !h.needNet() {
-	// 	stats.Network = info.NetworkStats{}
-	// }
+	if !h.needNet() {
+		stats.Network = info.NetworkStats{}
+	}
 
 	// Get filesystem stats.
 	err = h.getFsStats(stats)
